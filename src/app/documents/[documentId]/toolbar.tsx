@@ -2,9 +2,11 @@
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/use-editor-store";
+import {type ColorResult,SketchPicker} from "react-color"
 import {
   BoldIcon,
   ChevronDownIcon,
+  HighlighterIcon,
   ItalicIcon,
   ListTodoIcon,
   LucideIcon,
@@ -23,6 +25,52 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
+const HighlightColorButton =  () =>{
+  const { editor } = useEditorStore();
+  
+  const onChange =(color: ColorResult) =>{
+    editor?.chain().focus().setHighlight({color:color.hex}).run()
+  }
+
+  return(
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <HighlighterIcon className="size-4"/>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-0 border">
+        <SketchPicker
+          
+          onChange={onChange}
+        />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+const TextColorButton =  () =>{
+  const { editor } = useEditorStore();
+  const value = editor?.getAttributes("textStyle").color || "#000000"
+  const onChange =(color: ColorResult) =>{
+    editor?.chain().focus().setColor(color.hex).run()
+  }
+
+  return(
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="h-7 min-w-7 shrink-0 flex flex-col items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hiddden text-sm">
+          <span className="text-xs ">A</span>
+          <div className="h-0.5 w-full " style={{backgroundColor: value}}/>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-0 border">
+        <SketchPicker
+          color={value}
+          onChange={onChange}
+        />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 const HeadingLevelButton = () => {
   const { editor } = useEditorStore();
 
@@ -249,8 +297,8 @@ export const ToolBar = () => {
       {sections[1].map((item) => (
         <ToolBarButton key={item.label} {...item} />
       ))}
-      {/* TODO : Text Color */}
-      {/* Todo : Highlight coolor*/}
+      <TextColorButton/>
+      <HighlightColorButton/>
       <Separator orientation="vertical" className="h-5 bg-neutral-300" />
       {/* TODO : lINK */}
       {/*TODO : Image  */}

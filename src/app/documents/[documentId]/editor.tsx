@@ -13,6 +13,7 @@ import Underline from '@tiptap/extension-underline'
 import TextStyle from '@tiptap/extension-text-style'
 import FontFamily from '@tiptap/extension-font-family'
 import { Color } from '@tiptap/extension-color'
+import Highlight from '@tiptap/extension-highlight'
 import { useEditorStore } from '@/store/use-editor-store'
 export const Editor = () => {
   const {setEditor} = useEditorStore();
@@ -61,7 +62,11 @@ export const Editor = () => {
       ImageResize,
       Underline, 
       TextStyle, 
-      FontFamily],
+      FontFamily, 
+      Color,
+      Highlight.configure(
+        {multicolor: true}
+      )],
     content: `Hello`,
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
