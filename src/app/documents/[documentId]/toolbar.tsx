@@ -5,12 +5,18 @@ import { cn } from "@/lib/utils";
 import { useEditorStore } from "@/store/use-editor-store";
 import { type ColorResult, SketchPicker } from "react-color";
 import {
+  AlignCenterIcon,
+  AlignJustifyIcon,
+  AlignLeftIcon,
+  AlignRightIcon,
   BoldIcon,
   ChevronDownIcon,
   HighlighterIcon,
   ImageIcon,
   ItalicIcon,
   Link2Icon,
+  ListIcon,
+  ListOrderedIcon,
   ListTodoIcon,
   LucideIcon,
   MessageSquarePlusIcon,
@@ -41,6 +47,100 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { on } from "events";
+const ListButton = () => {
+  const { editor } = useEditorStore();
+  const lists= [
+    {
+      label: "Bullet List",
+      icon: ListIcon,
+      isActive: editor?.isActive("bulletList"),
+      onClick: () => editor?.chain().focus().toggleBulletList().run()
+    },
+    {
+      label: "Ordered List",
+      icon: ListOrderedIcon,
+      isActive: editor?.isActive("orderedList"),
+      onClick: () => editor?.chain().focus().toggleOrderedList().run()
+    },
+  ]
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <ListIcon className="size-4" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-1 flex flex-col gap-y-1">
+        {lists.map(({label, isActive,onClick, icon: Icon}) => {
+          return(
+            <button
+            className={cn("flex items-center gap-x-2 py-1 rounded-sm hover:bg-neutral-200/80",
+              isActive && "bg-neutal-200/80"
+            )}
+            key={label}
+            onClick={onClick}
+            >
+              <Icon className="size-4"/>
+              <span className="text-sm">
+                {label}
+              </span>
+            </button>
+          )
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+const AlignButton = () => {
+  const { editor } = useEditorStore();
+  const alignments = [
+    {
+      label: "Align Left",
+      icon  : AlignLeftIcon,
+      value: "left"
+    },
+    {
+      label: "Align Center",
+      icon  : AlignCenterIcon,
+      value: "center"
+    },
+    {
+      label: "Align Right",
+      icon  : AlignRightIcon,
+      value: "right"
+    },
+    {
+      label: "Align Justify",
+      icon  : AlignJustifyIcon,
+      value: "justify"
+    }
+  ]
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <AlignLeftIcon className="size-4" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="p-1 flex flex-col gap-y-1">
+        {alignments.map(({label, value, icon: Icon}) => {
+          return(
+            <button
+            className={cn("flex items-center gap-x-2 py-1 rounded-sm hover:bg-neutral-200/80",
+              editor?.isActive({textAlign: value}) && "bg-neutal-200/80"
+            )}
+            key={value}
+            onClick={() => editor?.chain().focus().setTextAlign(value).run()}
+            >
+              <Icon className="size-4"/>
+              <span className="text-sm">
+                {label}
+              </span>
+            </button>
+          )
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 const ImageButton = () => {
   const { editor } = useEditorStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -105,12 +205,13 @@ const ImageButton = () => {
             }
           }}
           />
-        </DialogContent>
-        <DialogFooter>
+          <DialogFooter>
           <Button onClick={handleImageUrlSubmit}>
             Submit
           </Button>
         </DialogFooter>
+        </DialogContent>
+        
       </Dialog>
     </>
   );
@@ -424,9 +525,9 @@ export const ToolBar = () => {
       <Separator orientation="vertical" className="h-5 bg-neutral-300" />
       <LinkButton />
       <ImageButton/>
-      {/*TODO: Align  */}
+      <AlignButton/>
       {/* TODO : LineHeight */}
-      {/* TODO: LIST */}
+      <ListButton/>
       {/*  */}
       {sections[2].map((item) => (
         <ToolBarButton key={item.label} {...item} />
