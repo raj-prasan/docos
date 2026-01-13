@@ -20,6 +20,8 @@ import {
   ListTodoIcon,
   LucideIcon,
   MessageSquarePlusIcon,
+  MinusIcon,
+  PlusIcon,
   PrinterIcon,
   Redo2Icon,
   RemoveFormattingIcon,
@@ -46,45 +48,124 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { on } from "events";
+
+const FontSizeButton = () => {
+  const { editor } = useEditorStore();
+  const currentFontSize = editor?.getAttributes("textStyle").fontSize
+    ? editor?.getAttributes("textStyle").fontSize.replace("px", "")
+    : "16";
+
+  const [fontSize, setFontSize] = useState(currentFontSize);
+  const [inputValue, setInputValue] = useState(fontSize);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const updateFontSize = (newSize: string) => {
+    const size = parseInt(newSize);
+    if (!isNaN(size) && size > 0) {
+      editor?.chain().focus().setFontSize(`${size}px`).run();
+      setFontSize(newSize);
+      setInputValue(newSize);
+      setIsEditing(false);
+    }
+  };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+  const handleInputBlur = () => {
+    updateFontSize(inputValue);
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      updateFontSize(inputValue);
+      editor?.commands.focus();
+    }
+  };
+  const increment = () => {
+    const newSize = parseInt(fontSize) + 1;
+    updateFontSize(newSize.toString());
+  };
+  const decrement = () => {
+    const newSize = parseInt(fontSize) - 1;
+    if (newSize > 0) {
+      updateFontSize(newSize.toString());
+    }
+  };
+
+  return(
+    <div className="flex items-center gap-x-0.5 ">
+      <button className="h-7 w-7 shrink-0 flex  items-center justify-center rounded-sm hover:bg-neutral-200/80"
+      onClick={decrement}> 
+        <MinusIcon className="size-3"/>
+      </button>
+      {isEditing ? (
+        <input
+          type= "text"
+          value = {inputValue}
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
+          onKeyDown={handleKeyDown}
+          className="h-7 w-10 text-sm border border-neutral-400 text-center rounded-sm bg-transparent focus:outline-none focus-ring-0 cursor-text"
+        />
+      ) :
+      (
+        <button className="h-7 w-10 text-sm border border-neutral-400 text-center rounded-sm hover:bg-neutral-200/80"
+        onClick={() =>{
+          setIsEditing(true);
+          setFontSize(currentFontSize)
+        }}
+        >
+          {currentFontSize}
+        </button>
+      )}
+      <button className="h-7 w-7 shrink-0 flex  items-center justify-center rounded-sm hover:bg-neutral-200/80"
+      onClick={increment}> 
+        <PlusIcon className="size-3"/>
+      </button>
+    </div>
+  )
+};
+
 const ListButton = () => {
   const { editor } = useEditorStore();
-  const lists= [
+  const lists = [
     {
       label: "Bullet List",
       icon: ListIcon,
       isActive: editor?.isActive("bulletList"),
-      onClick: () => editor?.chain().focus().toggleBulletList().run()
+      onClick: () => editor?.chain().focus().toggleBulletList().run(),
     },
     {
       label: "Ordered List",
       icon: ListOrderedIcon,
       isActive: editor?.isActive("orderedList"),
-      onClick: () => editor?.chain().focus().toggleOrderedList().run()
+      onClick: () => editor?.chain().focus().toggleOrderedList().run(),
     },
-  ]
+  ];
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <ListIcon className="size-4" />
+        <button className="h-7 min-w-7 shrink-0 flex flex-col items-center justify-center rounded-sm hover:bg-neutral-200/80 px-1.5 overflow-hiddden text-sm">
+         <ListIcon className="size-4" />
+        </button>
+       
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-1 flex flex-col gap-y-1">
-        {lists.map(({label, isActive,onClick, icon: Icon}) => {
-          return(
+        {lists.map(({ label, isActive, onClick, icon: Icon }) => {
+          return (
             <button
-            className={cn("flex items-center gap-x-2 py-1 rounded-sm hover:bg-neutral-200/80",
-              isActive && "bg-neutal-200/80"
-            )}
-            key={label}
-            onClick={onClick}
+              className={cn(
+                "flex items-center gap-x-2 py-1 rounded-sm hover:bg-neutral-200/80",
+                isActive && "bg-neutal-200/80"
+              )}
+              key={label}
+              onClick={onClick}
             >
-              <Icon className="size-4"/>
-              <span className="text-sm">
-                {label}
-              </span>
+              <Icon className="size-4" />
+              <span className="text-sm">{label}</span>
             </button>
-          )
+          );
         })}
       </DropdownMenuContent>
     </DropdownMenu>
@@ -95,25 +176,25 @@ const AlignButton = () => {
   const alignments = [
     {
       label: "Align Left",
-      icon  : AlignLeftIcon,
-      value: "left"
+      icon: AlignLeftIcon,
+      value: "left",
     },
     {
       label: "Align Center",
-      icon  : AlignCenterIcon,
-      value: "center"
+      icon: AlignCenterIcon,
+      value: "center",
     },
     {
       label: "Align Right",
-      icon  : AlignRightIcon,
-      value: "right"
+      icon: AlignRightIcon,
+      value: "right",
     },
     {
       label: "Align Justify",
-      icon  : AlignJustifyIcon,
-      value: "justify"
-    }
-  ]
+      icon: AlignJustifyIcon,
+      value: "justify",
+    },
+  ];
 
   return (
     <DropdownMenu>
@@ -121,21 +202,20 @@ const AlignButton = () => {
         <AlignLeftIcon className="size-4" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-1 flex flex-col gap-y-1">
-        {alignments.map(({label, value, icon: Icon}) => {
-          return(
+        {alignments.map(({ label, value, icon: Icon }) => {
+          return (
             <button
-            className={cn("flex items-center gap-x-2 py-1 rounded-sm hover:bg-neutral-200/80",
-              editor?.isActive({textAlign: value}) && "bg-neutal-200/80"
-            )}
-            key={value}
-            onClick={() => editor?.chain().focus().setTextAlign(value).run()}
+              className={cn(
+                "flex items-center gap-x-2 py-1 rounded-sm hover:bg-neutral-200/80",
+                editor?.isActive({ textAlign: value }) && "bg-neutal-200/80"
+              )}
+              key={value}
+              onClick={() => editor?.chain().focus().setTextAlign(value).run()}
             >
-              <Icon className="size-4"/>
-              <span className="text-sm">
-                {label}
-              </span>
+              <Icon className="size-4" />
+              <span className="text-sm">{label}</span>
             </button>
-          )
+          );
         })}
       </DropdownMenuContent>
     </DropdownMenu>
@@ -190,28 +270,25 @@ const ImageButton = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <Dialog open= {isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Insert Image URL</DialogTitle>
           </DialogHeader>
-          <Input 
-          placeholder="Insert Image URL"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          onKeyDown={(e) => {
-            if(e.key === "Enter"){
-              handleImageUrlSubmit()
-            }
-          }}
+          <Input
+            placeholder="Insert Image URL"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleImageUrlSubmit();
+              }
+            }}
           />
           <DialogFooter>
-          <Button onClick={handleImageUrlSubmit}>
-            Submit
-          </Button>
-        </DialogFooter>
+            <Button onClick={handleImageUrlSubmit}>Submit</Button>
+          </DialogFooter>
         </DialogContent>
-        
       </Dialog>
     </>
   );
@@ -516,7 +593,7 @@ export const ToolBar = () => {
       <Separator orientation="vertical" className="h-5 bg-neutral-300" />
       <HeadingLevelButton />
       <Separator orientation="vertical" className="h-5 bg-neutral-300" />
-      {/*Todo : Font Size*/}
+      <FontSizeButton />
       {sections[1].map((item) => (
         <ToolBarButton key={item.label} {...item} />
       ))}
@@ -524,10 +601,10 @@ export const ToolBar = () => {
       <HighlightColorButton />
       <Separator orientation="vertical" className="h-5 bg-neutral-300" />
       <LinkButton />
-      <ImageButton/>
-      <AlignButton/>
+      <ImageButton />
+      <AlignButton />
       {/* TODO : LineHeight */}
-      <ListButton/>
+      <ListButton />
       {/*  */}
       {sections[2].map((item) => (
         <ToolBarButton key={item.label} {...item} />

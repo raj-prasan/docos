@@ -17,6 +17,9 @@ import Highlight from '@tiptap/extension-highlight'
 import Link from '@tiptap/extension-link'
 import { TextAlign } from '@tiptap/extension-text-align'
 import { useEditorStore } from '@/store/use-editor-store'
+
+//custom Extension
+import {FontSizeExtension} from "@/extensions/font-size"
 export const Editor = () => {
   const {setEditor} = useEditorStore();
   const editor = useEditor({
@@ -51,7 +54,9 @@ export const Editor = () => {
 
       }
     },
-    extensions: [StarterKit, TaskItem.configure({
+    extensions: [StarterKit,
+      FontSizeExtension,
+      TaskItem.configure({
       nested: true
     }), TaskList,
     Table.configure({
