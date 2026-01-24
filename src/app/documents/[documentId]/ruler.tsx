@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useState, useEffect } from "react";
+import type { MouseEvent as ReactMouseEvent } from "react";
 import { useEditorStore } from "@/store/use-editor-store";
-import {FaCaretDown} from "@react-icons/fa"
 const markers = Array.from({ length: 83 }, (_, i) => i)
 
 export const Ruler = () => {
@@ -44,7 +44,7 @@ export const Ruler = () => {
     return Math.max(0, Math.min(desiredRight, maxRight));
   };
 
-  const startDrag = (side: "left" | "right") => (e: React.MouseEvent) => {
+  const startDrag = (side: "left" | "right") => (e: ReactMouseEvent) => {
     e.preventDefault();
     setDraggingSide(side);
     const rect = containerRef.current?.getBoundingClientRect();
@@ -121,8 +121,8 @@ interface MarkerProps {
   position : number;
   isLeft: boolean;
   isDragging: boolean;
-  onMouseDown : () =>void;
-  onDoubleClick: () =>void;
+  onMouseDown : (e: ReactMouseEvent) => void;
+  onDoubleClick: (e: ReactMouseEvent) => void;
 }
 const Marker = ({
   position,
