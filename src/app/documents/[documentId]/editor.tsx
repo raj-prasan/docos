@@ -21,7 +21,9 @@ import {Ruler} from "./ruler"
 //custom Extension
 import {FontSizeExtension} from "@/extensions/font-size"
 import { LineHeightExtension } from '@/extensions/line-height'
+import { useLiveblocksExtension} from "@liveblocks/react-tiptap";
 export const Editor = () => {
+  const liveblocks = useLiveblocksExtension();
   const {setEditor} = useEditorStore();
   const editor = useEditor({
     onCreate({editor}) {
@@ -55,7 +57,8 @@ export const Editor = () => {
 
       }
     },
-    extensions: [StarterKit,
+    extensions: [liveblocks,
+      StarterKit,
       LineHeightExtension.configure({
         types: ["paragraph", "heading"],
         defaultLineHeight: "normal"
@@ -85,7 +88,7 @@ export const Editor = () => {
       Highlight.configure(
         {multicolor: true}
       )],
-    content: `Hello`,
+    content: ``,
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
   })

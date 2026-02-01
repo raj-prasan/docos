@@ -19,6 +19,7 @@ import {
 import { FileIcon, FileJsonIcon, FileTextIcon, GlobeIcon, FilePlusIcon, FilePenIcon, TrashIcon, PrinterIcon, Undo2Icon, Redo2Icon, ScissorsIcon, CopyIcon, Clipboard, TextIcon, BoldIcon, ItalicIcon, UnderlineIcon, StrikethroughIcon, RemoveFormattingIcon, AArrowDown } from "lucide-react";
 import { BsFile, BsFilePdf } from "react-icons/bs";
 import { useEditorStore } from "@/store/use-editor-store";
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 
 
 const Navbar = () => {
@@ -215,6 +216,15 @@ const insertTable = ({rows, cols}: {rows: number, cols: number}) =>{
             </Menubar>
           </div>
         </div>
+      </div>
+      <div className="flex gap-3 items-center pl-6">
+        <OrganizationSwitcher
+        afterCreateOrganizationUrl="/"
+        afterLeaveOrganizationUrl="/"
+        afterSelectOrganizationUrl="/"
+        afterSelectPersonalUrl="/"
+        />
+        <UserButton/>
       </div>
     </nav>
   );
